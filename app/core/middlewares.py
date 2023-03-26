@@ -1,9 +1,9 @@
-# import time
-# import base64
-# from binascii import Error
+import time
+import base64
+from binascii import Error
 
-# from django.shortcuts import redirect
-# from django.http import Http404
+from django.shortcuts import redirect
+from django.http import Http404
 from django.contrib.auth import get_user_model
 from core.models import User
 
@@ -33,9 +33,7 @@ class JWTMiddleware:
 
         try:
             access_token_decoded = AccessToken(access_token)
-            user = get_user_model().objects.get(
-                id=access_token_decoded.payload.get("user_id")
-            )
+            get_user_model().objects.get(id=access_token_decoded.payload.get("user_id"))
             request.META["HTTP_AUTHORIZATION"] = f"Bearer {access_token_decoded}"
             auth_response = self.get_response(request)
 
@@ -71,31 +69,31 @@ class JWTMiddleware:
             return delete_cookies(response)
 
 
-# class ExpiringLinkMiddleware:
-#     """Middleware for handling expiring links."""
+class ExpiringLinkMiddleware:
+    """Middleware for handling expiring links."""
 
-#     def __init__(self, get_response):
-#         self.get_response = get_response
+    def __init__(self, get_response):
+        self.get_response = get_response
 
-#     def __call__(self, request):
-#         if request.GET.get("exp") == "1":
-#             if link := self.decode_link(request):
-#                 return redirect(link)
-#             raise Http404("Invalid or expired link.")
+    def __call__(self, request):
+        if request.GET.get("exp") == "1":
+            if link := self.decode_link(request):
+                return redirect(link)
+            raise Http404("Invalid or expired link.")
 
-#         response = self.get_response(request)
-#         return response
+        response = self.get_response(request)
+        return response
 
-#     def decode_link(self, request):
-#         """URL decoding method."""
-#         try:
-#             decrypted_path = base64.urlsafe_b64decode(
-#                 request.path[1:].encode("utf-8")
-#             ).decode("utf-8")
-#             expire_time_str = decrypted_path.split("=")[-1]
-#             expire_time = int(expire_time_str)
-#             if expire_time < time.time():
-#                 return False
-#             return decrypted_path.split("?")[0]
-#         except (UnicodeDecodeError, Error, ValueError):
-#             return False
+    def decode_link(self, request):
+        """URL decoding method."""
+        try:
+            decrypted_path = base64.urlsafe_b64decode(
+                request.path[1:].encode("utf-8")
+            ).decode("utf-8")
+            expire_time_str = decrypted_path.split("=")[-1]
+            expire_time = int(expire_time_str)
+            if expire_time < time.time():
+                return False
+            return decrypted_path.split("?")[0]
+        except (UnicodeDecodeError, Error, ValueError):
+            return False

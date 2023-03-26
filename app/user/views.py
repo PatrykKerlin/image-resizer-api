@@ -16,7 +16,10 @@ from user.serializers import UserSerializer, TokenObtainPairSerializer
 
 from core.utils.functions import set_cookies, delete_cookies
 
+from drf_spectacular.utils import extend_schema
 
+
+@extend_schema(tags=["user"])
 class CreateUserView(CreateAPIView):
     """Create a new user view."""
 
@@ -24,6 +27,7 @@ class CreateUserView(CreateAPIView):
     parser_classes = [FormParser]
 
 
+@extend_schema(tags=["user"])
 class ManageUserView(RetrieveUpdateDestroyAPIView):
     """Manage the authenticated user."""
 
@@ -45,6 +49,7 @@ class ManageUserView(RetrieveUpdateDestroyAPIView):
         return delete_cookies(response)
 
 
+@extend_schema(tags=["authentication"])
 class LogInView(TokenObtainPairView):
     """Create httponly cookies with jwt tokens for a user."""
 
@@ -54,18 +59,23 @@ class LogInView(TokenObtainPairView):
     def post(self, request, *args, **kwargs):
         response = super().post(request, *args, **kwargs)
 
-        if response.status_code != status.HTTP_200_OK:
+        access = response.data.get("access", None)
+        refresh = response.data.get("refresh", None)
+
+        if response.status_code != status.HTTP_200_OK or not (access and refresh):
             return Response(
                 {"success": False},
-                status=status.HTTP_401_UNAUTHORIZED,
+                status=status.HTTP_400_BAD_REQUEST,
             )
 
-        set_cookies(response, response.data["access"], response.data["refresh"])
+        set_cookies(response, access, refresh)
 
-        response.data = {"success": True}
+        response.data["success"] = True
+
         return response
 
 
+@extend_schema(tags=["authentication"])
 class LogOutView(APIView):
     """Delete httponly cookies with jwt tokens."""
 
