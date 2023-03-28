@@ -18,12 +18,14 @@ urlpatterns = [
     path(
         "images/resize/<int:pk>/", views.GetResizedAPIView.as_view(), name="resized-get"
     ),
-    path("resized/", views.ResizedAPIView.as_view(), name="resized-list"),
+    path("images/resized/", views.ResizedAPIView.as_view(), name="resized-list"),
     path(
-        "resized/<int:pk>/", views.DetailResizedAPIView.as_view(), name="resized-detail"
+        "images/resized/<int:pk>/",
+        views.DetailResizedAPIView.as_view(),
+        name="resized-detail",
     ),
     path(
-        "resized/link/<int:pk>/",
+        "images/resized/link/<int:pk>/",
         views.LinkViewSet.as_view({"get": "retrieve"}),
         name="resized-expiring",
     ),

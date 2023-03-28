@@ -299,7 +299,7 @@ class GetResizedAPIView(APIView):
         )
 
 
-@extend_schema(tags=["resized"])
+@extend_schema(tags=["resized_images"])
 class DetailResizedAPIView(generics.RetrieveDestroyAPIView):
     queryset = Resized.objects.all()
     serializer_class = serializers.DetailResizedSerializer
@@ -312,7 +312,7 @@ class DetailResizedAPIView(generics.RetrieveDestroyAPIView):
         return Resized.objects.filter(user=self.request.user)
 
 
-@extend_schema(tags=["resized"])
+@extend_schema(tags=["resized_images"])
 class ResizedAPIView(generics.ListAPIView):
     queryset = Resized.objects.all()
     serializer_class = serializers.ListResizedSerializer
